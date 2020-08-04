@@ -28,7 +28,6 @@ defmodule Urepo.MixProject do
     [
       {:plug_cowboy, "~> 2.3.0"},
       {:hex_core, "~> 0.6.0"},
-      {:cachex, "~> 3.2.0"},
       {:jason, "~> 1.0"},
       {:ex_aws_s3, "~> 2.0"},
       {:dialyxir, "~> 1.0", only: :dev, runtime: false},

@@ -1,33 +1,24 @@
 defmodule Urepo.Docs do
-  @cache __MODULE__.Cache
+  use GenServer
 
-  def child_spec(_) do
-    import Cachex.Spec
+  @files __MODULE__.Files
+  @paths __MODULE__.Paths
 
-    opts = [
-      expiration: expiration(default: :timer.hours(24))
-    ]
-
-    %{
-      id: __MODULE__,
-      start: {Cachex, :start_link, [@cache, opts]},
-      type: :supervisor
-    }
-  end
+  def start_link(_), do: GenServer.start_link(__MODULE__, [])
 
   def file(name, version, path) do
     files =
-      case Cachex.get(@cache, {:paths, name, version}) do
-        {:ok, nil} ->
-          {:ok, files} = fetch_and_save(name, version)
+      case :ets.lookup(@paths, {name, version}) do
+        [{_, files}] when is_map(files) ->
           files
 
-        {:ok, files} when is_map(files) ->
+        [] ->
+          {:ok, files} = fetch_and_save(name, version)
           files
       end
 
     with {:ok, hash} <- Map.fetch(files, path),
-         {:ok, content} <- Cachex.get(@cache, {:content, hash}),
+         [{^hash, content}] <- :ets.lookup(@files, hash),
          do: {:ok, content}
   end
 
@@ -37,13 +28,21 @@ defmodule Urepo.Docs do
         Enum.reduce(files, {%{}, []}, fn {path, content}, {paths, hashes} ->
           hash = :crypto.hash(:sha, content)
 
-          {Map.put(paths, to_string(path), hash), [{{:content, hash}, content} | hashes]}
+          {Map.put(paths, to_string(path), hash), [{hash, content} | hashes]}
         end)
 
-      {:ok, _} = Cachex.put(@cache, {:paths, name, version}, Map.new(paths))
-      {:ok, _} = Cachex.put_many(@cache, hashes)
+      true = :ets.insert(@paths, {{name, version}, Map.new(paths)})
+      true = :ets.insert(@files, hashes)
 
       {:ok, paths}
     end
+  end
+
+  def init(_) do
+    options = [:named_table, :public, write_concurrency: false, read_concurrency: true]
+    _ = :ets.new(@files, options)
+    _ = :ets.new(@paths, options)
+
+    {:ok, []}
   end
 end
