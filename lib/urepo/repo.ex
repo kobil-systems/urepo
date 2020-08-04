@@ -1,6 +1,8 @@
 defmodule Urepo.Repo do
   use GenServer
 
+  require Logger
+
   alias Urepo.Store
 
   @name __MODULE__
@@ -11,10 +13,18 @@ defmodule Urepo.Repo do
     GenServer.start_link(__MODULE__, store, name: @name)
   end
 
+  @doc """
+  Add new release to the package `name`
+  """
+  @spec add(name :: binary(), release :: map()) :: :ok | {:error, term()}
   def add(name, release) do
     GenServer.call(@name, {:add_release, name, release})
   end
 
+  @doc """
+  Get releases for given package
+  """
+  @spec get_releases(name :: binary()) :: {:ok, [map()]} | {:error, term()}
   def get_releases(name) do
     GenServer.call(@name, {:get_releases, name})
   end
@@ -26,6 +36,7 @@ defmodule Urepo.Repo do
     {:ok, names} =
       with {:ok, data} <- Store.fetch(store, "names") do
         data
+        |> :zlib.gunzip()
         |> :hex_registry.decode_signed()
         |> Map.fetch!(:payload)
         |> :hex_registry.decode_names(Urepo.name())
@@ -33,21 +44,26 @@ defmodule Urepo.Repo do
         _ -> {:ok, []}
       end
 
+    Logger.debug("Loaded packages: #{inspect(names)}")
+
     releases =
       for %{name: name} <- names, into: %{} do
         path = Path.join(["packages", name])
 
-        releases =
+        {:ok, releases} =
           case Store.fetch(store, path) do
             {:ok, content} ->
               content
+              |> :zlib.gunzip()
               |> :hex_registry.decode_signed()
               |> Map.fetch!(:payload)
               |> :hex_registry.decode_package(Urepo.name(), name)
 
             _ ->
-              []
+              {:ok, []}
           end
+
+        Logger.debug("Loaded releases for package #{name}")
 
         {name, releases}
       end

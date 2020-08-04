@@ -24,3 +24,4 @@ urepo-*.tar
 
 /repo
 *.pem
+/.minio.sys
