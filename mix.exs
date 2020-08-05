@@ -21,7 +21,10 @@ defmodule Urepo.MixProject do
   def application do
     [
       extra_applications: [:logger, :crypto],
-      mod: {Urepo.Application, []}
+      mod: {Urepo.Application, []},
+      env: [
+        port: 8080
+      ]
     ]
   end
 
