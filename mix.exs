@@ -38,6 +38,8 @@ defmodule Urepo.MixProject do
       {:hex_core, "~> 0.6.0"},
       {:jason, "~> 1.0"},
       {:ex_aws_s3, "~> 2.0"},
+      {:distillery, "~> 2.1"},
+      # Development tools
       {:dialyxir, "~> 1.0", only: :dev, runtime: false},
       {:ex_doc, "~> 0.22.0", only: :dev, runtime: false},
       {:excoveralls, ">= 0.0.0", only: [:dev, :test], runtime: false}
