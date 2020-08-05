@@ -4,6 +4,7 @@ This application takes only few configuration options:
 
 - `:name` - name of the current repo, need to be the same as on all developers
   machines
+- `:token` - authorization token used for communication with API. **Required!**
 - `:port` - port on which application listens. Defaults to `8080`.
 - `:public_key` and `:private_key` - paths to the public and private parts of
   the RSA 2048-bit key used for signing the repo contents.

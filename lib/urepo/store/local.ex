@@ -1,6 +1,4 @@
 defmodule Urepo.Store.Local do
-  @behaviour Urepo.Store
-
   @moduledoc """
   Storage that uses locally mounted filesystem for storing the packages.
 
@@ -8,6 +6,8 @@ defmodule Urepo.Store.Local do
 
   - `:path` - local path where all the packages will be stored
   """
+
+  @behaviour Urepo.Store
 
   require Logger
 
