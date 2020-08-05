@@ -56,8 +56,11 @@ defmodule Urepo.MixProject do
       {:jason, "~> 1.0"},
       {:ex_aws_s3, "~> 2.0"},
       {:distillery, "~> 2.1"},
+      # Observability
+      {:prometheus_plugs, "~> 1.1"},
       # Development tools
       {:dialyxir, "~> 1.0", only: :dev, runtime: false},
+      {:credo, "~> 1.4", only: :dev, runtime: false},
       {:ex_doc, "~> 0.22.0", only: :dev, runtime: false},
       {:excoveralls, ">= 0.0.0", only: [:dev, :test], runtime: false}
     ]

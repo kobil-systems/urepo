@@ -4,11 +4,15 @@ defmodule Urepo.Endpoint do
   use Plug.Builder
   use Plug.ErrorHandler
 
+  alias Urepo.Plugs
+
   plug(Plug.Logger)
+  plug(Plugs.Exporter)
+  plug(Plugs.Instrumenter)
   plug(:forward)
 
   defp forward(conn, _opts) do
-    case IO.inspect(conn) do
+    case conn do
       %Plug.Conn{path_info: ["docs" | rest]} ->
         conn
         |> put_private(:prefix, "/docs/")
@@ -26,7 +30,7 @@ defmodule Urepo.Endpoint do
 
   @spec route(Plug.Conn.t(), binary()) :: binary()
   def route(conn, path) do
-    prefix = conn.private[:prefix] || []
+    prefix = conn.private[:prefix]
     uri = %URI{
       authority: "#{conn.host}:#{conn.port}",
       host: conn.host,

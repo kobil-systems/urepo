@@ -9,3 +9,4 @@
 - Add stores documentation
 - Add Distillery releases
 - Add authorization to API requests
+- Add Prometheus metrics to Plug

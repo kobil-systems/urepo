@@ -16,6 +16,15 @@ defmodule Urepo.Application do
       strategy: :one_for_one
     ]
 
+    _ = setup()
+
     Supervisor.start_link(children, opts)
+  end
+
+  defp setup do
+    [
+      Urepo.Plugs.Exporter,
+      Urepo.Plugs.Instrumenter
+    ] |> Enum.each(& &1.setup())
   end
 end

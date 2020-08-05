@@ -10,16 +10,13 @@ defmodule Urepo.Repo.Router do
   plug(:dispatch)
 
   get "/packages" do
-    conn
-    |> put_resp_content_type("application/vnd.hex+erlang")
-    |> send_resp(200, :erlang.term_to_binary([]))
+    send_erlang(conn, 200, [])
   end
 
   get "/packages/:name" do
     case Urepo.Repo.get_releases(name) do
       {:ok, releases} ->
         conn
-        |> put_resp_content_type("application/vnd.hex+erlang")
         |> send_erlang(200, %{
           name: name,
           url: route(conn, ""),
@@ -42,8 +39,7 @@ defmodule Urepo.Repo.Router do
 
   get "/packages/:name/release/:version" do
     conn
-    |> put_resp_content_type("application/json")
-    |> send_resp(501, "{}")
+    |> send_erlang(501, %{})
   end
 
   post "/publish" do
