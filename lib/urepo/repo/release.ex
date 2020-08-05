@@ -1,4 +1,4 @@
-defmodule Urepo.Release do
+defmodule Urepo.Repo.Release do
   def from_tarball(tarball) do
     with {:ok, result} <- :hex_tarball.unpack(tarball, :memory),
          :ok <- validate_metadata(result.metadata) do

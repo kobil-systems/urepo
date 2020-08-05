@@ -1,5 +1,6 @@
 defmodule Urepo do
   alias Urepo.Store
+  alias Urepo.Repo
 
   @type tarball() :: iodata()
 
@@ -10,8 +11,8 @@ defmodule Urepo do
   def publish_release(tarball) do
     store = store()
 
-    with {:ok, {name, release}} <- Urepo.Release.from_tarball(tarball) do
-      Urepo.Repo.add(name, release)
+    with {:ok, {name, release}} <- Repo.Release.from_tarball(tarball) do
+      Repo.add(name, release)
 
       Store.put(store, Path.join(["tarballs", "#{name}-#{release.version}.tar"]), tarball)
 
@@ -43,7 +44,7 @@ defmodule Urepo do
   end
 
   @doc "Get name for the current repository"
-  def name, do: Application.get_env(:urepo, :name, "urepo")
+  def name, do: Application.fetch_env!(:urepo, :name)
 
   @doc "Get store configuration for current repository"
   def store, do: Application.fetch_env!(:urepo, :store)

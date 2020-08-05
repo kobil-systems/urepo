@@ -13,6 +13,7 @@ defmodule Urepo.MixProject do
       ],
       test_coverage: [tool: ExCoveralls],
       deps: deps(),
+      docs: docs(),
       aliases: [test: "test --no-start"]
     ]
   end
@@ -23,6 +24,7 @@ defmodule Urepo.MixProject do
       extra_applications: [:logger, :crypto],
       mod: {Urepo.Application, []},
       env: [
+        name: "urepo",
         port: 8080
       ]
     ]
@@ -30,6 +32,21 @@ defmodule Urepo.MixProject do
 
   defp paths(:test), do: ~w[lib test/support]
   defp paths(_), do: ~w[lib]
+
+  defp docs do
+    [
+      main: "readme",
+      formatters: ["html"],
+      extras: ~w[
+        guides/configuration.md
+        README.md
+        CHANGELOG.md
+      ],
+      groups_for_modules: [
+        "Stores": ~r/^Urepo\.Store\./
+      ]
+    ]
+  end
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do

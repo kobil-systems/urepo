@@ -1,4 +1,6 @@
 defmodule Urepo.APIRouter do
+  @moduledoc false
+
   use Plug.Router
   use Plug.ErrorHandler
 

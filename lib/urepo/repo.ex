@@ -1,4 +1,11 @@
 defmodule Urepo.Repo do
+  @moduledoc """
+  Repo builder and cache.
+
+  ## TODO
+
+  - Heavily refactor this module as it is currently humongous monster
+  """
   use GenServer
 
   require Logger

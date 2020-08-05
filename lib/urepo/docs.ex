@@ -1,6 +1,17 @@
 defmodule Urepo.Docs do
   use GenServer
 
+  @moduledoc """
+  In-memory host for the Hex documentation.
+
+  This lazily loades the documentation pages when needed and stores them by hash
+  of their content to reduce the memory footprint of the application.
+  In addition to storing `{hash, content}` pairs it also stores index of all
+  pages per release (which is name/version pair).
+
+  All in-memory storage is backed by ETS tables.
+  """
+
   @files __MODULE__.Files
   @paths __MODULE__.Paths
 

@@ -14,6 +14,7 @@ defmodule UrepoTest do
     Application.put_env(:urepo, :store, {Store, []})
 
     Application.ensure_all_started(:urepo)
+
     on_exit(fn ->
       Application.stop(:urepo)
     end)
@@ -23,7 +24,8 @@ defmodule UrepoTest do
 
   describe "tarball" do
     test "publishing correct tarball results in success" do
-      assert {:ok, %{version: "0.1.0"}} = @subject.publish_release(fixture("tarballs/example-0.1.0.tar"))
+      assert {:ok, %{version: "0.1.0"}} =
+               @subject.publish_release(fixture("tarballs/example-0.1.0.tar"))
     end
 
     test "invalid tarball will be rejected" do

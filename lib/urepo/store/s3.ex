@@ -1,4 +1,25 @@
 defmodule Urepo.Store.S3 do
+  @moduledoc """
+  Storage that uses AWS S3-compatible storage for storing packages.
+
+  ## Options
+
+  - `:bucket` - name of S3 bucket that will be used
+
+  ## Additional configuration
+
+  When using `Urepo.Store.S3` store then the `:ex_aws` need to be configured accordingly
+  by setting either AWS standard environment variables, proper IAM roles, or by
+  setting `:access_key_id` and `:secret_access_key` values for `:ex_aws`
+  application:
+
+  ```elixir
+  config :ex_aws,
+    access_key_id: "example_key_id",
+    secret_access_key: "example_key"
+  ```
+  """
+
   @behaviour Urepo.Store
 
   @impl true

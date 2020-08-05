@@ -14,6 +14,7 @@ defmodule Urepo.DocsTest do
     Application.put_env(:urepo, :store, {Store, []})
 
     Application.ensure_all_started(:urepo)
+
     on_exit(fn ->
       Application.stop(:urepo)
     end)
