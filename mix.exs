@@ -6,12 +6,14 @@ defmodule Urepo.MixProject do
       app: :urepo,
       version: "0.1.0",
       elixir: "~> 1.10",
+      elixirc_paths: paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       preferred_cli_env: [
         "coveralls.html": :test
       ],
       test_coverage: [tool: ExCoveralls],
-      deps: deps()
+      deps: deps(),
+      aliases: [test: "test --no-start"]
     ]
   end
 
@@ -22,6 +24,9 @@ defmodule Urepo.MixProject do
       mod: {Urepo.Application, []}
     ]
   end
+
+  defp paths(:test), do: ~w[lib test/support]
+  defp paths(_), do: ~w[lib]
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do

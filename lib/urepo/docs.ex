@@ -7,22 +7,30 @@ defmodule Urepo.Docs do
   def start_link(_), do: GenServer.start_link(__MODULE__, [])
 
   def file(name, version, path) do
-    files =
-      case :ets.lookup(@paths, {name, version}) do
-        [{_, files}] when is_map(files) ->
-          files
-
-        [] ->
-          {:ok, files} = fetch_and_save(name, version)
-          files
-      end
-
-    with {:ok, hash} <- Map.fetch(files, path),
-         [{^hash, content}] <- :ets.lookup(@files, hash),
-         do: {:ok, content}
+    with {:ok, files} <- lookup(@paths, {name, version}, &fetch_and_save/1),
+         {:ok, hash} <- Map.fetch(files, path),
+         {:ok, content} <- lookup(@files, hash) do
+      {:ok, content}
+    else
+      _ -> :error
+    end
   end
 
-  defp fetch_and_save(name, version) do
+  defp lookup(table, key) do
+    case :ets.lookup(table, key) do
+      [{^key, data}] -> {:ok, data}
+      [] -> :error
+    end
+  end
+
+  defp lookup(table, key, cb) do
+    case :ets.lookup(table, key) do
+      [{^key, data}] -> {:ok, data}
+      [] -> cb.(key)
+    end
+  end
+
+  defp fetch_and_save({name, version}) do
     with {:ok, files} <- Urepo.get_docs(name, version) do
       {paths, hashes} =
         Enum.reduce(files, {%{}, []}, fn {path, content}, {paths, hashes} ->
