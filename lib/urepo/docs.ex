@@ -1,6 +1,9 @@
 defmodule Urepo.Docs do
   use GenServer
 
+  alias Urepo.Store
+  alias Urepo.Utils
+
   @moduledoc """
   In-memory host for the Hex documentation.
 
@@ -12,10 +15,30 @@ defmodule Urepo.Docs do
   All in-memory storage is backed by ETS tables.
   """
 
+  @name __MODULE__
+
   @files __MODULE__.Files
   @paths __MODULE__.Paths
 
-  def start_link(_), do: GenServer.start_link(__MODULE__, [])
+  @prefix "docs"
+
+  def newest(name) do
+    with {:ok, [newest | _]} <- versions(name),
+         do: {:ok, newest}
+  end
+
+  def versions(name) do
+    GenServer.call(@name, {:versions, name})
+  end
+
+  @doc """
+  Publish documentation for package `name` with `version` using `tarball`.
+  """
+  @spec publish(name :: binary(), version :: binary(), Urepo.tarball()) ::
+          :ok | {:error, term()}
+  def publish(name, version, tarball) do
+    GenServer.call(@name, {:publish, name, version, tarball})
+  end
 
   def file(name, version, path) do
     with {:ok, files} <- lookup(@paths, {name, version}, &fetch_and_save/1),
@@ -42,7 +65,9 @@ defmodule Urepo.Docs do
   end
 
   defp fetch_and_save({name, version}) do
-    with {:ok, files} <- Urepo.get_docs(name, version) do
+    store = GenServer.call(@name, :store)
+    with {:ok, tarball} <- Store.fetch(store, Path.join(@prefix, "#{name}-#{version}.tar")),
+         {:ok, files} <- :hex_tarball.unpack_docs(tarball, :memory) do
       {paths, hashes} =
         Enum.reduce(files, {%{}, []}, fn {path, content}, {paths, hashes} ->
           hash = :crypto.hash(:sha, content)
@@ -57,11 +82,51 @@ defmodule Urepo.Docs do
     end
   end
 
+  ## Server implementation
+
+  def start_link(_), do: GenServer.start_link(__MODULE__, [], name: @name)
+
+  @impl true
   def init(_) do
     options = [:named_table, :public, write_concurrency: false, read_concurrency: true]
     _ = :ets.new(@files, options)
     _ = :ets.new(@paths, options)
 
-    {:ok, []}
+    store = Urepo.store()
+    index =
+      with {:ok, raw} <- Store.fetch(store, Path.join(@prefix, "index.etf")),
+           {:ok, data} <- Utils.verify(raw),
+           {:ok, map} when is_map(map) <- decode(data) do
+        map
+      else
+        _ -> %{}
+      end
+
+    {:ok, {store, index}}
+  end
+
+  @impl true
+  def handle_call({:publish, name, version, tarball}, _ref, {store, index}) do
+    reply = Store.put(store, Path.join(@prefix, "#{name}-#{version}.tar"), tarball)
+
+    new_index = Map.update(index, name, [version], &Utils.append_version(&1, version))
+
+    Store.put(store, Path.join(@prefix, "index.etf"), Utils.sign(:erlang.term_to_binary(new_index)))
+
+    {:reply, reply, {store, new_index}}
+  end
+
+  def handle_call({:versions, name}, _ref, {_, index} = state) do
+    {:reply, Map.fetch(index, name), state}
+  end
+
+  def handle_call(:store, _ref, {store, _} = state) do
+    {:reply, store, state}
+  end
+
+  defp decode(binary) when is_binary(binary) do
+    {:ok, :erlang.binary_to_term(binary)}
+  rescue
+    ArgumentError -> :error
   end
 end

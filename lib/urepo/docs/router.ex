@@ -9,9 +9,9 @@ defmodule Urepo.Docs.Router do
   plug(:dispatch)
 
   get "/:package" do
-    case Urepo.Repo.get_releases(package) do
-      {:ok, [current | _]} ->
-        redirect(conn, route(conn, "#{package}/#{current.version}/index.html"))
+    case Urepo.Docs.newest(package) do
+      {:ok, version} ->
+        redirect(conn, route(conn, "#{package}/#{version}/index.html"))
 
       _ ->
         send_resp(conn, 404, "")
@@ -26,20 +26,17 @@ defmodule Urepo.Docs.Router do
   end
 
   get "/:package/:version/docs_config.js" do
-    case Urepo.Repo.get_releases(package) do
-      {:ok, releases} ->
+    case Urepo.Docs.versions(package) do
+      {:ok, versions} ->
         versions =
-          for release <- releases do
-            %{
-              version: "v" <> release.version,
-              url: route(conn, "#{package}/#{release.version}")
-            }
+          for version <- versions do
+            [~S({"version":"v), version, ~S(","url":"), route(conn, "#{package}/#{version}"), ~S("})]
           end
 
         send_resp(conn, 200, [
-          "var versionNodes=",
-          Jason.encode_to_iodata!(versions),
-          ";"
+          "var versionNodes=[",
+          Enum.intersperse(versions, ?,),
+          "];"
         ])
 
       _ ->

@@ -20,29 +20,6 @@ defmodule Urepo do
     end
   end
 
-  @doc """
-  Publish documentation for package `name` with `version` using `tarball`.
-  """
-  @spec publish_docs(name :: binary(), version :: binary(), tarball()) ::
-          :ok | {:error, term()}
-  def publish_docs(name, version, tarball) do
-    store = store()
-
-    with :ok <- Store.put(store, Path.join(["docs", "#{name}-#{version}.tar"]), tarball),
-         do: :ok
-  end
-
-  @doc """
-  Load documentation from the store for given package and version.
-  """
-  @spec get_docs(name :: binary(), version :: binary()) ::
-          {:ok, [{Path.t(), iodata()}]} | {:error, term()}
-  def get_docs(name, version) do
-    with {:ok, tarball} <- Store.fetch(store(), Path.join(["docs", "#{name}-#{version}.tar"])),
-         {:ok, files} <- :hex_tarball.unpack_docs(tarball, :memory),
-         do: {:ok, files}
-  end
-
   @doc "Get name for the current repository"
   def name, do: Application.fetch_env!(:urepo, :name)
 

@@ -25,7 +25,7 @@ defmodule UrepoTest do
   describe "tarball" do
     test "publishing correct tarball results in success" do
       assert {:ok, %{version: "0.1.0"}} =
-               @subject.publish_release(fixture("tarballs/example-0.1.0.tar"))
+        @subject.publish_release(fixture("tarballs/example-0.1.0.tar"))
     end
 
     test "invalid tarball will be rejected" do
@@ -42,17 +42,6 @@ defmodule UrepoTest do
       assert {:error, _} = Store.fetch("versions", [])
       assert {:ok, _} = @subject.publish_release(fixture("tarballs/example-0.1.0.tar"))
       assert {:ok, _} = Store.fetch("versions", [])
-    end
-  end
-
-  describe "docs" do
-    test "publishing correct docs tarball results in success" do
-      assert :ok = @subject.publish_docs("example", "0.1.0", fixture("docs/example-0.1.0.tar"))
-    end
-
-    test "published docs can be fetched" do
-      assert :ok = @subject.publish_docs("example", "0.1.0", fixture("docs/example-0.1.0.tar"))
-      assert {:ok, _} = @subject.get_docs("example", "0.1.0")
     end
   end
 end

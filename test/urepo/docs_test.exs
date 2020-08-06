@@ -19,24 +19,36 @@ defmodule Urepo.DocsTest do
       Application.stop(:urepo)
     end)
 
-    assert :ok = Urepo.publish_docs("example", "0.1.0", fixture("docs/example-0.1.0.tar"))
-
     :ok
   end
 
-  test "fetching existing file succeeds" do
-    assert {:ok, _} = @subject.file("example", "0.1.0", "index.html")
+  describe "publish" do
+    test "publishing correct docs tarball results in success" do
+      assert :ok = @subject.publish("example", "0.1.0", fixture("docs/example-0.1.0.tar"))
+    end
   end
 
-  test "fetching docs for non-existent package fails" do
-    assert :error = @subject.file("non_existent", "0.1.0", "index.html")
-  end
+  describe "file" do
+    setup do
+      assert :ok = @subject.publish("example", "0.1.0", fixture("docs/example-0.1.0.tar"))
 
-  test "fetching docs for non-existent version fails" do
-    assert :error = @subject.file("example", "0.2.0", "index.html")
-  end
+      :ok
+    end
 
-  test "fetching docs for non-existent file fails" do
-    assert :error = @subject.file("example", "0.1.0", "non-existent.html")
+    test "fetching existing file succeeds" do
+      assert {:ok, _} = @subject.file("example", "0.1.0", "index.html")
+    end
+
+    test "fetching docs for non-existent package fails" do
+      assert :error = @subject.file("non_existent", "0.1.0", "index.html")
+    end
+
+    test "fetching docs for non-existent version fails" do
+      assert :error = @subject.file("example", "0.2.0", "index.html")
+    end
+
+    test "fetching docs for non-existent file fails" do
+      assert :error = @subject.file("example", "0.1.0", "non-existent.html")
+    end
   end
 end

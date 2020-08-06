@@ -55,7 +55,7 @@ defmodule Urepo.Repo.Router do
   post "/packages/:name/releases/:version/docs" do
     {:ok, tarball, conn} = read_tarball(conn)
 
-    case Urepo.publish_docs(name, version, tarball) do
+    case Urepo.Docs.publish(name, version, tarball) do
       :ok ->
         conn
         |> put_resp_header("location", route(conn, "/docs/#{name}/#{version}/index.html"))
