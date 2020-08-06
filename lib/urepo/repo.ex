@@ -11,6 +11,7 @@ defmodule Urepo.Repo do
   require Logger
 
   alias Urepo.Store
+  alias Urepo.Utils
 
   @name __MODULE__
 
@@ -40,15 +41,13 @@ defmodule Urepo.Repo do
   def init(_opts) do
     store = Urepo.store()
 
-    {:ok, names} =
-      with {:ok, data} <- Store.fetch(store, "names") do
-        data
-        |> :zlib.gunzip()
-        |> :hex_registry.decode_signed()
-        |> Map.fetch!(:payload)
-        |> :hex_registry.decode_names(Urepo.name())
+    names =
+      with {:ok, raw} <- Store.fetch(store, "names"),
+           {:ok, data} <- Utils.verify(raw),
+           {:ok, names} <- :hex_registry.decode_names(data, Urepo.name()) do
+        names
       else
-        _ -> {:ok, []}
+        _ -> []
       end
 
     Logger.debug("Loaded packages: #{inspect(names)}")
@@ -57,17 +56,13 @@ defmodule Urepo.Repo do
       for %{name: name} <- names, into: %{} do
         path = Path.join(["packages", name])
 
-        {:ok, releases} =
-          case Store.fetch(store, path) do
-            {:ok, content} ->
-              content
-              |> :zlib.gunzip()
-              |> :hex_registry.decode_signed()
-              |> Map.fetch!(:payload)
-              |> :hex_registry.decode_package(Urepo.name(), name)
-
-            _ ->
-              {:ok, []}
+        releases =
+          with {:ok, raw} <- Store.fetch(store, path),
+               {:ok, data} <- Utils.verify(raw),
+               {:ok, package} <- :hex_registry.decode_package(data, Urepo.name(), name) do
+            package
+          else
+            _ -> []
           end
 
         Logger.debug("Loaded releases for package #{name}")
@@ -81,62 +76,40 @@ defmodule Urepo.Repo do
   @impl true
   def handle_call({:add_release, name, release}, _ref, %{releases: releases} = state) do
     repo_name = Urepo.name()
-    store = Urepo.store()
-    private_key = Urepo.private_key()
 
-    releases =
-      Map.update(releases, name, [release], fn releases ->
-        [release | releases]
-        |> Enum.sort_by(& &1.version, {:desc, Version})
-        |> Enum.dedup_by(& &1.version)
+    by = &(&1.version)
+    {package, releases} =
+      Map.get_and_update(releases, name, fn
+        nil -> {[release], [release]}
+        old when is_list(old) ->
+          new = Utils.append_version(old, release, by)
+          {new, new}
       end)
 
-    Store.put(
-      store,
-      Path.join("packages", name),
-      encode(
-        :package,
-        %{
-          releases: Map.fetch!(releases, name),
-          name: name,
-          repository: repo_name
-        },
-        private_key
-      )
-    )
+    %{
+      releases: package,
+      name: name,
+      repository: repo_name
+    }
+    |> store(:package, ["packages", name])
 
-    names = Map.keys(releases) |> Enum.map(&%{name: &1})
-
-    packages =
-      Enum.map(releases, fn {name, releases} ->
-        %{name: name, versions: Enum.map(releases, & &1.version), retired: []}
+    {names, packages} =
+      Enum.reduce(releases, {[], []}, fn {name, releases}, {names, packages} ->
+        package = %{name: name, versions: Enum.map(releases, & &1.version), retired: []}
+        {[%{name: name} | names], [package | packages]}
       end)
 
-    Store.put(
-      store,
-      "names",
-      encode(
-        :names,
-        %{
-          packages: names,
-          repository: repo_name
-        },
-        private_key
-      )
-    )
+    %{
+      packages: names,
+      repository: repo_name
+    }
+    |> store(:names)
 
-    Store.put(
-      store,
-      "versions",
-      encode(
-        :versions,
-        %{
-          packages: packages,
-          repository: repo_name
-        },
-        private_key
-      )
-    )
+    %{
+      packages: packages,
+      repository: repo_name
+    }
+    |> store(:versions)
 
     {:reply, :ok, struct(state, releases: releases)}
   end
@@ -145,9 +118,15 @@ defmodule Urepo.Repo do
     {:reply, Map.fetch(releases, name), state}
   end
 
-  defp encode(type, data, private_key) do
-    apply(:hex_registry, :"encode_#{type}", [data])
-    |> :hex_registry.sign_protobuf(private_key)
-    |> :zlib.gzip()
+  defp store(data, type), do: store(data, type, to_string(type))
+
+  defp store(data, type, path) do
+    store = Urepo.store()
+
+    content =
+      apply(:hex_registry, :"encode_#{type}", [data])
+      |> Urepo.Utils.sign()
+
+    Store.put(store, Path.join(List.wrap(path)), content)
   end
 end
