@@ -25,6 +25,7 @@ defmodule Urepo.Application do
     [
       Urepo.Plugs.Exporter,
       Urepo.Plugs.Instrumenter
-    ] |> Enum.each(& &1.setup())
+    ]
+    |> Enum.each(& &1.setup())
   end
 end

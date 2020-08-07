@@ -43,7 +43,7 @@ defmodule Urepo.MixProject do
         CHANGELOG.md
       ],
       groups_for_modules: [
-        "Stores": ~r/^Urepo\.Store\./
+        Stores: ~r/^Urepo\.Store\./
       ]
     ]
   end

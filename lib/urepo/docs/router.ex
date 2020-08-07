@@ -30,7 +30,13 @@ defmodule Urepo.Docs.Router do
       {:ok, versions} ->
         versions =
           for version <- versions do
-            [~S({"version":"v), version, ~S(","url":"), route(conn, "#{package}/#{version}"), ~S("})]
+            [
+              ~S({"version":"v),
+              version,
+              ~S(","url":"),
+              route(conn, "#{package}/#{version}"),
+              ~S("})
+            ]
           end
 
         send_resp(conn, 200, [

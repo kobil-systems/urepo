@@ -1,6 +1,8 @@
 defmodule Urepo.Utils do
   @moduledoc false
 
+  @dialyzer no_return: [sign: 1]
+
   @doc """
   Add new version to the enumerable. Resulting enumerable will be deduplicated
   and will be sorted by versions in decreasing order (highest version first).

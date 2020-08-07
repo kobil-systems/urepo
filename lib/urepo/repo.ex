@@ -6,6 +6,9 @@ defmodule Urepo.Repo do
 
   - Heavily refactor this module as it is currently humongous monster
   """
+
+  @dialyzer no_return: [store: 3], no_unused: [store: 2]
+
   use GenServer
 
   require Logger
@@ -77,10 +80,13 @@ defmodule Urepo.Repo do
   def handle_call({:add_release, name, release}, _ref, %{releases: releases} = state) do
     repo_name = Urepo.name()
 
-    by = &(&1.version)
+    by = & &1.version
+
     {package, releases} =
       Map.get_and_update(releases, name, fn
-        nil -> {[release], [release]}
+        nil ->
+          {[release], [release]}
+
         old when is_list(old) ->
           new = Utils.append_version(old, release, by)
           {new, new}

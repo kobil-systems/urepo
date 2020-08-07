@@ -25,7 +25,7 @@ defmodule UrepoTest do
   describe "tarball" do
     test "publishing correct tarball results in success" do
       assert {:ok, %{version: "0.1.0"}} =
-        @subject.publish_release(fixture("tarballs/example-0.1.0.tar"))
+               @subject.publish_release(fixture("tarballs/example-0.1.0.tar"))
     end
 
     test "invalid tarball will be rejected" do

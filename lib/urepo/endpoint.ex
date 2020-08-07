@@ -31,6 +31,7 @@ defmodule Urepo.Endpoint do
   @spec route(Plug.Conn.t(), binary()) :: binary()
   def route(conn, path) do
     prefix = conn.private[:prefix]
+
     uri = %URI{
       authority: "#{conn.host}:#{conn.port}",
       host: conn.host,
