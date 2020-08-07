@@ -22,7 +22,6 @@ defmodule Urepo.Docs.RouterTest do
     :ok
   end
 
-
   test "using just package name redirects to version" do
     conn =
       conn(:get, "/example")
