@@ -15,3 +15,14 @@ This application takes only few configuration options:
 
     + `Urepo.Store.Local`
     + `Urepo.Store.S3`
+
+Example `sys.config`:
+
+```erlang
+[{urepo,[{token,<<"secret">>},
+         {public_key,<<"public.pem">>},
+         {private_key,<<"private.pem">>},
+         {store,{'Elixir.Urepo.Store.S3',[{bucket,<<"repo">>}]}}]},
+ {ex_aws,[{s3,[{access_key_id,<<"minioadmin">>},
+               {secret_access_key,<<"minioadmin">>}]}]}].
+```
