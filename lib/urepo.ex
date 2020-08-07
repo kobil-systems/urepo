@@ -31,8 +31,78 @@ defmodule Urepo do
   def store, do: Application.fetch_env!(:urepo, :store)
 
   @doc "Get content of PEM encoded file containing private key"
-  def private_key, do: File.read!(Application.get_env(:urepo, :private_key))
+  def private_key do
+    perm_get(:private_key, fn ->
+      Application.fetch_env!(:urepo, :private_key)
+      |> File.read!()
+    end)
+  end
 
   @doc "Get content of PEM encoded file containing public key"
-  def public_key, do: File.read!(Application.get_env(:urepo, :public_key))
+  def public_key do
+    perm_get(:public_key, fn ->
+      case Application.fetch_env(:urepo, :public_key) do
+        {:ok, path} ->
+          File.read!(path)
+
+        :error ->
+          private_key()
+          |> :public_key.pem_decode()
+          |> Enum.map(&:public_key.pem_entry_decode/1)
+          |> hd()
+          |> extract_public_key()
+          |> pem_encode(:RSAPublicKey)
+      end
+    end)
+  end
+
+  defp perm_get(key, cb) do
+    key = {__MODULE__, key}
+
+    case :persistent_term.get(key, nil) do
+      nil ->
+        data = cb.()
+        :ok = :persistent_term.put(key, data)
+        data
+
+      data ->
+        data
+    end
+  end
+
+  def generate_keys do
+    {:ok, private_key} = generate_rsa_key(2048, 65537)
+    public_key = extract_public_key(private_key)
+    {pem_encode(private_key, :RSAPrivateKey), pem_encode(public_key, :RSAPublicKey)}
+  end
+
+  require Record
+
+  Record.defrecord(
+    :rsa_private_key,
+    :RSAPrivateKey,
+    Record.extract(:RSAPrivateKey, from_lib: "public_key/include/OTP-PUB-KEY.hrl")
+  )
+
+  Record.defrecord(
+    :rsa_public_key,
+    :RSAPublicKey,
+    Record.extract(:RSAPublicKey, from_lib: "public_key/include/OTP-PUB-KEY.hrl")
+  )
+
+  defp pem_encode(key, type) do
+    :public_key.pem_encode([:public_key.pem_entry_encode(type, key)])
+  end
+
+  defp generate_rsa_key(keysize, e) do
+    private_key = :public_key.generate_key({:rsa, keysize, e})
+    {:ok, private_key}
+  rescue
+    FunctionClauseError ->
+      {:error, :not_supported}
+  end
+
+  defp extract_public_key(rsa_private_key(modulus: m, publicExponent: e)) do
+    rsa_public_key(modulus: m, publicExponent: e)
+  end
 end

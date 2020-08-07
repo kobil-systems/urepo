@@ -47,6 +47,9 @@ end
 
 release :urepo do
   set version: current_version(:urepo)
+  set commands: [
+    genkeys: "rel/commands/genkeys"
+  ]
   set applications: [
     :runtime_tools,
     :urepo
