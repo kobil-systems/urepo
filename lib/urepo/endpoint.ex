@@ -24,7 +24,7 @@ defmodule Urepo.Endpoint do
         |> Plug.forward(rest, Urepo.Repo.Router, [])
 
       _ ->
-        Plug.Conn.send_resp(conn, 404, "Not found")
+        Urepo.Ui.Router.call(conn, [])
     end
   end
 
