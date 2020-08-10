@@ -13,6 +13,7 @@ defmodule Urepo.Docs.RouterTest do
     Application.put_env(:urepo, :store, {Store, []})
 
     Application.ensure_all_started(:urepo)
+
     on_exit(fn ->
       Application.stop(:urepo)
     end)
@@ -22,14 +23,15 @@ defmodule Urepo.Docs.RouterTest do
     :ok
   end
 
-
   test "using just package name redirects to version" do
     conn =
       conn(:get, "/example")
       |> send()
 
     assert conn.status == 302
-    assert ["http://www.example.com/example/0.1.0/index.html"] == get_resp_header(conn, "location")
+
+    assert ["http://www.example.com/example/0.1.0/index.html"] ==
+             get_resp_header(conn, "location")
   end
 
   test "using package name and version redirect to index" do
@@ -38,7 +40,9 @@ defmodule Urepo.Docs.RouterTest do
       |> send()
 
     assert conn.status == 302
-    assert ["http://www.example.com/example/0.1.0/index.html"] == get_resp_header(conn, "location")
+
+    assert ["http://www.example.com/example/0.1.0/index.html"] ==
+             get_resp_header(conn, "location")
   end
 
   test "can fetch index.html of the package" do
@@ -55,7 +59,9 @@ defmodule Urepo.Docs.RouterTest do
       |> send()
 
     assert conn.status == 302
-    assert ["http://www.example.com/example/0.1.0/index.html"] == get_resp_header(conn, "location")
+
+    assert ["http://www.example.com/example/0.1.0/index.html"] ==
+             get_resp_header(conn, "location")
   end
 
   defp send(conn), do: @subject.call(conn, [])

@@ -1,4 +1,6 @@
 defmodule Urepo.Store.Memory do
+  @moduledoc false
+
   use GenServer
 
   @behaviour Urepo.Store

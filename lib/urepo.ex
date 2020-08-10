@@ -1,6 +1,10 @@
 defmodule Urepo do
-  alias Urepo.Store
+  @moduledoc """
+  Entyrpoint module for μRepo
+  """
+
   alias Urepo.Repo
+  alias Urepo.Store
 
   @type tarball() :: iodata()
 

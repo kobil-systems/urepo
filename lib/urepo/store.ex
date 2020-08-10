@@ -1,4 +1,8 @@
 defmodule Urepo.Store do
+  @moduledoc """
+  Definition of store for repo files
+  """
+
   @callback put(path :: binary(), content :: iodata(), opts :: keyword()) ::
               :ok | {:error, term()}
   @callback fetch(path :: binary(), opts :: keyword()) :: {:ok, binary()} | {:error, term()}

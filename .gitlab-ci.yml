@@ -1,0 +1,6 @@
+variables:
+  BRANCH: "false"
+
+include:
+  - project: 'ecoservers/gitlab-ci'
+    file: '/.gitlab-ci-common-template.yml'

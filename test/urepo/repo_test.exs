@@ -3,6 +3,7 @@ defmodule Urepo.RepoTest do
 
   import Urepo.Fixtures
 
+  alias Urepo.Repo.Release
   alias Urepo.Store.Memory, as: Store
 
   @subject Urepo.Repo
@@ -19,8 +20,7 @@ defmodule Urepo.RepoTest do
       Application.stop(:urepo)
     end)
 
-    assert {:ok, {name, release}} =
-             Urepo.Repo.Release.from_tarball(fixture("tarballs/example-0.1.0.tar"))
+    assert {:ok, {name, release}} = Release.from_tarball(fixture("tarballs/example-0.1.0.tar"))
 
     {:ok, name: name, release: release}
   end

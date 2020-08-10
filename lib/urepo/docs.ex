@@ -1,9 +1,4 @@
 defmodule Urepo.Docs do
-  use GenServer
-
-  alias Urepo.Store
-  alias Urepo.Utils
-
   @moduledoc """
   In-memory host for the Hex documentation.
 
@@ -14,6 +9,13 @@ defmodule Urepo.Docs do
 
   All in-memory storage is backed by ETS tables.
   """
+
+  @dialyzer no_match: [fetch_and_save: 1]
+
+  use GenServer
+
+  alias Urepo.Store
+  alias Urepo.Utils
 
   @name __MODULE__
 
@@ -66,6 +68,7 @@ defmodule Urepo.Docs do
 
   defp fetch_and_save({name, version}) do
     store = GenServer.call(@name, :store)
+
     with {:ok, tarball} <- Store.fetch(store, Path.join(@prefix, "#{name}-#{version}.tar")),
          {:ok, files} <- :hex_tarball.unpack_docs(tarball, :memory) do
       {paths, hashes} =
@@ -93,6 +96,7 @@ defmodule Urepo.Docs do
     _ = :ets.new(@paths, options)
 
     store = Urepo.store()
+
     index =
       with {:ok, raw} <- Store.fetch(store, Path.join(@prefix, "index.etf")),
            {:ok, data} <- Utils.verify(raw),
@@ -111,7 +115,11 @@ defmodule Urepo.Docs do
 
     new_index = Map.update(index, name, [version], &Utils.append_version(&1, version))
 
-    Store.put(store, Path.join(@prefix, "index.etf"), Utils.sign(:erlang.term_to_binary(new_index)))
+    Store.put(
+      store,
+      Path.join(@prefix, "index.etf"),
+      Utils.sign(:erlang.term_to_binary(new_index))
+    )
 
     {:reply, reply, {store, new_index}}
   end

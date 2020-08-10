@@ -1,4 +1,9 @@
 defmodule Urepo.Repo.Release do
+  @moduledoc """
+  Information about release of the package
+  """
+
+  @doc "Build release info from tarball"
   def from_tarball(tarball) do
     with {:ok, result} <- :hex_tarball.unpack(tarball, :memory),
          :ok <- validate_metadata(result.metadata) do
