@@ -6,6 +6,9 @@ defmodule Urepo.Store do
   @callback put(path :: binary(), content :: iodata(), opts :: keyword()) ::
               :ok | {:error, term()}
   @callback fetch(path :: binary(), opts :: keyword()) :: {:ok, binary()} | {:error, term()}
+  @callback url(opts :: keyword()) :: {:ok, binary()} | :error
+
+  @optional_callbacks url: 1
 
   def put({mod, state}, path, content, opts \\ []) do
     full_opts = Keyword.merge(state, opts)
@@ -17,5 +20,17 @@ defmodule Urepo.Store do
     full_opts = Keyword.merge(state, opts)
 
     mod.fetch(path, full_opts)
+  end
+
+  def url({mod, state}, opts \\ []) do
+    case function_exported?(mod, :url, 1) do
+      true ->
+        full_opts = Keyword.merge(state, opts)
+
+        mod.url(full_opts)
+
+      _ ->
+        :error
+    end
   end
 end
