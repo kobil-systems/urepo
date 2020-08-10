@@ -43,4 +43,23 @@ defmodule Urepo.Store.S3 do
       error -> {:error, error}
     end
   end
+
+  @impl true
+  def url(opts) do
+    bucket = Keyword.fetch!(opts, :bucket)
+
+    case ExAws.Config.new(:s3) |> ExAws.S3.presigned_url(:get, bucket, "") do
+      {:ok, signed_url} ->
+        url =
+          signed_url
+          |> URI.parse()
+          |> struct(query: nil)
+          |> URI.to_string()
+
+        {:ok, url}
+
+      _ ->
+        :error
+    end
+  end
 end

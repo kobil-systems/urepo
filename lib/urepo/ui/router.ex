@@ -1,4 +1,6 @@
 defmodule Urepo.Ui.Router do
+  @moduledoc false
+
   use Plug.Router
 
   alias Urepo.Endpoint
@@ -13,12 +15,18 @@ defmodule Urepo.Ui.Router do
   end
 
   get "/" do
+    store_url =
+      case Urepo.store_url() do
+        {:ok, url} -> url
+        :error -> "<store_url>"
+      end
+
     conn
     |> put_resp_content_type("text/plain")
     |> send_resp(200, """
     To install this repo run
 
-    mix hex.repo add #{Urepo.name()} <store_url> --public-key <(curl #{
+    mix hex.repo add #{Urepo.name()} #{store_url} --public-key <(curl #{
       Endpoint.route(conn, "/public.pem")
     } --auth-key <auth-key>
     """)

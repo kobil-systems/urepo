@@ -24,6 +24,8 @@ defmodule Urepo do
     end
   end
 
+  def store_url, do: Store.url(store())
+
   @doc "Get name for the current repository"
   def name, do: Application.fetch_env!(:urepo, :name)
 
@@ -71,7 +73,7 @@ defmodule Urepo do
   end
 
   def generate_keys do
-    {:ok, private_key} = generate_rsa_key(2048, 65537)
+    {:ok, private_key} = generate_rsa_key(2048, 65_537)
     public_key = extract_public_key(private_key)
     {pem_encode(private_key, :RSAPrivateKey), pem_encode(public_key, :RSAPublicKey)}
   end
