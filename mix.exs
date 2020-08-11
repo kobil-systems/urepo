@@ -4,7 +4,7 @@ defmodule Urepo.MixProject do
   def project do
     [
       app: :urepo,
-      version: "0.3.0",
+      version: "0.3.1",
       elixir: "~> 1.10",
       elixirc_paths: paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
@@ -54,6 +54,7 @@ defmodule Urepo.MixProject do
       {:plug_cowboy, "~> 2.3.0"},
       {:hex_core, "~> 0.6.0"},
       {:ex_aws_s3, "~> 2.0"},
+      {:jason, "~> 1.0"},
       {:hackney, "~> 1.16"},
       {:distillery, "~> 2.1"},
       # Observability

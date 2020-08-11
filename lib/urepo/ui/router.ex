@@ -28,7 +28,7 @@ defmodule Urepo.Ui.Router do
 
     mix hex.repo add #{Urepo.name()} #{store_url} --public-key <(curl #{
       Endpoint.route(conn, "/public.pem")
-    } --auth-key <auth-key>
+    }) --auth-key <auth-key>
     """)
   end
 

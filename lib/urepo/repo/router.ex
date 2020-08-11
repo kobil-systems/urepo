@@ -78,7 +78,9 @@ defmodule Urepo.Repo.Router do
       conn
     else
       _ ->
-        send_erlang(conn, 401, "unauthorized")
+        conn
+        |> send_erlang(401, "unauthorized")
+        |> halt()
     end
   end
 
