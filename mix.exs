@@ -54,6 +54,7 @@ defmodule Urepo.MixProject do
       {:plug_cowboy, "~> 2.3.0"},
       {:hex_core, "~> 0.6.0"},
       {:ex_aws_s3, "~> 2.0"},
+      {:sweet_xml, "~> 0.6.6"},
       {:jason, "~> 1.0"},
       {:hackney, "~> 1.16"},
       {:distillery, "~> 2.1"},
