@@ -28,7 +28,9 @@ defmodule Urepo do
     store = store()
 
     case Store.url(store, path) do
-      {:ok, url} -> {:url, url}
+      {:ok, url} ->
+        {:url, url}
+
       :error ->
         with {:ok, content} <- Store.fetch(store, path),
              do: {:content, content}
