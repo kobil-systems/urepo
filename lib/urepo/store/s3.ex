@@ -26,7 +26,7 @@ defmodule Urepo.Store.S3 do
   def put(path, content, opts) do
     bucket = Keyword.fetch!(opts, :bucket)
 
-    ExAws.S3.put_object(bucket, path, content, acl: :public_read)
+    ExAws.S3.put_object(bucket, path, content, acl: :private)
     |> ExAws.request!()
 
     :ok
@@ -45,18 +45,12 @@ defmodule Urepo.Store.S3 do
   end
 
   @impl true
-  def url(opts) do
+  def url(path, opts) do
     bucket = Keyword.fetch!(opts, :bucket)
 
-    case ExAws.Config.new(:s3) |> ExAws.S3.presigned_url(:get, bucket, "") do
+    case ExAws.Config.new(:s3) |> ExAws.S3.presigned_url(:get, bucket, path) do
       {:ok, signed_url} ->
-        url =
-          signed_url
-          |> URI.parse()
-          |> struct(query: nil)
-          |> URI.to_string()
-
-        {:ok, url}
+        {:ok, signed_url}
 
       _ ->
         :error

@@ -1,4 +1,4 @@
-defmodule Urepo.Repo.Router do
+defmodule Urepo.API.Router do
   @moduledoc false
 
   use Plug.Router

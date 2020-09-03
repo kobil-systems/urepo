@@ -24,7 +24,16 @@ defmodule Urepo do
     end
   end
 
-  def store_url, do: Store.url(store())
+  def store_content(path) do
+    store = store()
+
+    case Store.url(store, path) do
+      {:ok, url} -> {:url, url}
+      :error ->
+        with {:ok, content} <- Store.fetch(store, path),
+             do: {:content, content}
+    end
+  end
 
   @doc "Get name for the current repository"
   def name, do: Application.fetch_env!(:urepo, :name)
