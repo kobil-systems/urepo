@@ -24,6 +24,8 @@ defmodule Urepo.Docs do
 
   @prefix "docs"
 
+  def names, do: GenServer.call(@name, :names)
+
   def newest(name) do
     with {:ok, [newest | _]} <- versions(name),
          do: {:ok, newest}
@@ -126,6 +128,10 @@ defmodule Urepo.Docs do
 
   def handle_call({:versions, name}, _ref, {_, index} = state) do
     {:reply, Map.fetch(index, name), state}
+  end
+
+  def handle_call(:names, _ref, {_, index} = state) do
+    {:reply, Map.keys(index), state}
   end
 
   def handle_call(:store, _ref, {store, _} = state) do

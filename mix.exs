@@ -48,7 +48,6 @@ defmodule Urepo.MixProject do
     ]
   end
 
-  # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
       {:plug_cowboy, "~> 2.3.0"},
@@ -57,7 +56,9 @@ defmodule Urepo.MixProject do
       {:sweet_xml, "~> 0.6.6"},
       {:jason, "~> 1.0"},
       {:hackney, "~> 1.16"},
+      # Deployment
       {:distillery, "~> 2.1"},
+      {:systemd, "~> 0.5"},
       # Observability
       {:prometheus_plugs, "~> 1.1"},
       # Development tools

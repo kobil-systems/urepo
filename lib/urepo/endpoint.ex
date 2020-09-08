@@ -61,6 +61,10 @@ defmodule Urepo.Endpoint do
     |> send_resp(conn.status || 302, body)
   end
 
+  def handle_errors(conn, %{kind: type, reason: reason, stack: stack}) do
+    send_resp(conn, conn.status, Exception.format(type, reason, stack))
+  end
+
   def handle_errors(conn, error) do
     send_resp(conn, conn.status, "Something went wrong: #{inspect(error)}")
   end

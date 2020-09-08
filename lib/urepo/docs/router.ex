@@ -3,10 +3,18 @@ defmodule Urepo.Docs.Router do
 
   use Plug.Router
 
+  alias Urepo.Docs.View
+
   import Urepo.Endpoint, only: [route: 2, redirect: 2]
 
   plug(:match)
   plug(:dispatch)
+
+  get "/" do
+    names = Urepo.Docs.names()
+
+    View.send(conn, :index, names: names)
+  end
 
   get "/:package" do
     case Urepo.Docs.newest(package) do
@@ -55,5 +63,9 @@ defmodule Urepo.Docs.Router do
       {:ok, content} -> send_resp(conn, 200, content)
       _ -> send_resp(conn, 404, "")
     end
+  end
+
+  get _ do
+    send_resp(conn, 404, "Not found")
   end
 end

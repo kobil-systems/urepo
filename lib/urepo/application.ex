@@ -9,7 +9,8 @@ defmodule Urepo.Application do
     children = [
       Urepo.Repo,
       Urepo.Docs,
-      {Plug.Cowboy, scheme: :http, plug: Urepo.Endpoint, options: [port: port]}
+      {Plug.Cowboy, scheme: :http, plug: Urepo.Endpoint, options: [port: port]},
+      :systemd.ready()
     ]
 
     opts = [
