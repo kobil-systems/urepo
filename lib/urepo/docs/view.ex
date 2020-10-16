@@ -1,4 +1,6 @@
 defmodule Urepo.Docs.View do
+  @moduledoc false
+
   require EEx
 
   import Urepo.Endpoint, only: [route: 2]

@@ -3,6 +3,7 @@ defmodule Urepo.Docs.Router do
 
   use Plug.Router
 
+  alias Urepo.Docs
   alias Urepo.Docs.View
 
   import Urepo.Endpoint, only: [route: 2, redirect: 2]
@@ -11,13 +12,13 @@ defmodule Urepo.Docs.Router do
   plug(:dispatch)
 
   get "/" do
-    names = Urepo.Docs.names()
+    names = Docs.names()
 
     View.send(conn, :index, names: names)
   end
 
   get "/:package" do
-    case Urepo.Docs.newest(package) do
+    case Docs.newest(package) do
       {:ok, version} ->
         redirect(conn, route(conn, "#{package}/#{version}/index.html"))
 
@@ -34,7 +35,7 @@ defmodule Urepo.Docs.Router do
   end
 
   get "/:package/:version/docs_config.js" do
-    case Urepo.Docs.versions(package) do
+    case Docs.versions(package) do
       {:ok, versions} ->
         versions =
           for version <- versions do
@@ -59,7 +60,7 @@ defmodule Urepo.Docs.Router do
   end
 
   get "/:package/:version/*path" do
-    case Urepo.Docs.file(package, version, Path.join(path)) do
+    case Docs.file(package, version, Path.join(path)) do
       {:ok, content} -> send_resp(conn, 200, content)
       _ -> send_resp(conn, 404, "")
     end

@@ -50,7 +50,7 @@ defmodule Urepo.MixProject do
 
   defp deps do
     [
-      {:plug_cowboy, "~> 2.3.0"},
+      {:plug_cowboy, "~> 2.3"},
       {:hex_core, "~> 0.6.0"},
       {:ex_aws_s3, "~> 2.0"},
       {:sweet_xml, "~> 0.6.6"},
@@ -64,7 +64,7 @@ defmodule Urepo.MixProject do
       # Development tools
       {:dialyxir, "~> 1.0", only: :dev, runtime: false},
       {:credo, "~> 1.4", only: :dev, runtime: false},
-      {:ex_doc, "~> 0.22.0", only: :dev, runtime: false},
+      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:excoveralls, ">= 0.0.0", only: [:dev, :test], runtime: false}
     ]
   end
