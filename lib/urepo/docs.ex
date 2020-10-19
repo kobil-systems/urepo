@@ -35,6 +35,10 @@ defmodule Urepo.Docs do
     GenServer.call(@name, {:versions, name})
   end
 
+  def count do
+    GenServer.call(@name, :count)
+  end
+
   @doc """
   Publish documentation for package `name` with `version` using `tarball`.
   """
@@ -132,6 +136,10 @@ defmodule Urepo.Docs do
 
   def handle_call(:names, _ref, {_, index} = state) do
     {:reply, Map.keys(index), state}
+  end
+
+  def handle_call(:count, _ref, {_, index} = state) do
+    {:reply, map_size(index), state}
   end
 
   def handle_call(:store, _ref, {store, _} = state) do

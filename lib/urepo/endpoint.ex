@@ -7,6 +7,7 @@ defmodule Urepo.Endpoint do
   alias Urepo.Plugs
 
   plug(Plug.Logger)
+  plug(Plugs.Health)
   plug(Plugs.Exporter)
   plug(Plugs.Instrumenter)
   plug(:forward)

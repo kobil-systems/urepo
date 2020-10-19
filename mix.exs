@@ -4,7 +4,7 @@ defmodule Urepo.MixProject do
   def project do
     [
       app: :urepo,
-      version: "0.3.2",
+      version: "0.3.3",
       elixir: "~> 1.10",
       elixirc_paths: paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
