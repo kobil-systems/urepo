@@ -76,7 +76,7 @@ defmodule Urepo.Docs do
     store = GenServer.call(@name, :store)
 
     with {:ok, tarball} <- Store.fetch(store, Path.join(@prefix, "#{name}-#{version}.tar")),
-         {:ok, files} <- :hex_tarball.unpack_docs(tarball, :memory) do
+         {:ok, files} <- :hex_tarball.unpack_docs(tarball, :memory, Urepo.hex_config()) do
       {paths, hashes} =
         Enum.reduce(files, {%{}, []}, fn {path, content}, {paths, hashes} ->
           hash = :crypto.hash(:sha, content)

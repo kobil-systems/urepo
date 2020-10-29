@@ -43,6 +43,10 @@ defmodule Urepo do
   @doc "Get store configuration for current repository"
   def store, do: Application.fetch_env!(:urepo, :store)
 
+  @doc "Get Hex configuration"
+  def hex_config,
+    do: Enum.into(Application.get_env(:urepo, :hex, []), :hex_core.default_config())
+
   @doc "Get content of PEM encoded file containing private key"
   def private_key do
     perm_get(:private_key, fn ->

@@ -5,7 +5,7 @@ defmodule Urepo.Repo.Release do
 
   @doc "Build release info from tarball"
   def from_tarball(tarball) do
-    with {:ok, result} <- :hex_tarball.unpack(tarball, :memory),
+    with {:ok, result} <- :hex_tarball.unpack(tarball, :memory, Urepo.hex_config()),
          :ok <- validate_metadata(result.metadata) do
       {:ok, {result.metadata["name"], build_release(result)}}
     end
