@@ -1,4 +1,6 @@
 defmodule Urepo.Plugs.Health do
+  @moduledoc false
+
   @behaviour Plug
 
   def init(_), do: []
@@ -9,12 +11,15 @@ defmodule Urepo.Plugs.Health do
 
     conn
     |> Plug.Conn.put_resp_content_type("application/json")
-    |> Plug.Conn.send_resp(:ok, Jason.encode_to_iodata!(%{
-      version: version,
-      counts: %{
-        docs: docs_count
-      }
-    }))
+    |> Plug.Conn.send_resp(
+      :ok,
+      Jason.encode_to_iodata!(%{
+        version: version,
+        counts: %{
+          docs: docs_count
+        }
+      })
+    )
     |> Plug.Conn.halt()
   end
 
