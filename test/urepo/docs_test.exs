@@ -26,6 +26,15 @@ defmodule Urepo.DocsTest do
     test "publishing correct docs tarball results in success" do
       assert :ok = @subject.publish("example", "0.1.0", fixture("docs/example-0.1.0.tar"))
     end
+
+    test "publishing tarball with unclean paths results in failure" do
+      assert {:error, {:index_missing, _keys}} =
+               @subject.publish(
+                 "example",
+                 "0.1.0",
+                 fixture("docs/unclean_path_example-0.1.0.tar")
+               )
+    end
   end
 
   describe "file" do
@@ -39,12 +48,12 @@ defmodule Urepo.DocsTest do
       assert {:ok, _} = @subject.file("example", "0.1.0", "index.html")
     end
 
-    test "fetching docs for non-existent package fails" do
-      assert :error = @subject.file("non_existent", "0.1.0", "index.html")
+    test "fetching docs for non-existent package fails with :not_exists" do
+      assert {:error, :not_exists} = @subject.file("non_existent", "0.1.0", "index.html")
     end
 
-    test "fetching docs for non-existent version fails" do
-      assert :error = @subject.file("example", "0.2.0", "index.html")
+    test "fetching docs for non-existent version fails with :not_exists" do
+      assert {:error, :not_exists} = @subject.file("example", "0.2.0", "index.html")
     end
 
     test "fetching docs for non-existent file fails" do

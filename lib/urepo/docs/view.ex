@@ -11,16 +11,21 @@ defmodule Urepo.Docs.View do
     Plug.Conn.send_resp(conn, status, rendered)
   end
 
-  EEx.function_from_string(:def, :index, """
-  <html>
-    <head><title>Documented packages</title></head>
-    <body>
-      <ul>
-        <%= for name <- @names do %>
-          <li><a href="<%= route(@conn, name) %>"><%= name %></a></li>
-        <% end %>
-      </ul>
-    </body>
-  </html>
-  """, [:assigns])
+  EEx.function_from_string(
+    :def,
+    :index,
+    """
+    <html>
+      <head><title>Documented packages</title></head>
+      <body>
+        <ul>
+          <%= for name <- @names do %>
+            <li><a href="<%= route(@conn, name) %>"><%= name %></a></li>
+          <% end %>
+        </ul>
+      </body>
+    </html>
+    """,
+    [:assigns]
+  )
 end

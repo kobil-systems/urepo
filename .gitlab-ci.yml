@@ -1,5 +1,6 @@
 variables:
   BRANCH: "false"
+  DOCKERHUB: "false"
 
 include:
   - project: 'ecoservers/gitlab-ci'

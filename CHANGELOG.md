@@ -1,3 +1,6 @@
+## 0.4.0
+- CHG: uploaded tarballs must contain an index.html as entrypoint otherwise uploading returns failure (SCP-1185)
+
 ## Pre-release
 
 - Implement local storage

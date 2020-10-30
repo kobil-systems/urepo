@@ -13,6 +13,7 @@ defmodule Urepo.Docs do
   @dialyzer no_match: [fetch_and_save: 1]
 
   use GenServer
+  require Logger
 
   alias Urepo.Store
   alias Urepo.Utils
@@ -45,7 +46,14 @@ defmodule Urepo.Docs do
   @spec publish(name :: binary(), version :: binary(), Urepo.tarball()) ::
           :ok | {:error, term()}
   def publish(name, version, tarball) do
-    GenServer.call(@name, {:publish, name, version, tarball})
+    with :ok <- GenServer.call(@name, {:publish, name, version, tarball}),
+         {:ok, _} <- fetch_and_save({name, version}) do
+      :ok
+    else
+      error ->
+        Logger.debug("Urepo.Docs.publish/3 error: #{inspect(error)}")
+        error
+    end
   end
 
   def file(name, version, path) do
@@ -54,7 +62,9 @@ defmodule Urepo.Docs do
          {:ok, content} <- lookup(@files, hash) do
       {:ok, content}
     else
-      _ -> :error
+      error ->
+        Logger.debug("Urepo.Docs.file/3 error: #{inspect(error)}")
+        error
     end
   end
 
@@ -84,10 +94,21 @@ defmodule Urepo.Docs do
           {Map.put(paths, to_string(path), hash), [{hash, content} | hashes]}
         end)
 
-      true = :ets.insert(@paths, {{name, version}, Map.new(paths)})
-      true = :ets.insert(@files, hashes)
+      if Map.has_key?(paths, "index.html") do
+        true = :ets.insert(@paths, {{name, version}, Map.new(paths)})
+        true = :ets.insert(@files, hashes)
 
-      {:ok, paths}
+        {:ok, paths}
+      else
+        paths_keys = Map.keys(paths)
+
+        # the implementation of this server assumes there to exist an 'index.html' as an entrypoint into a given tarball
+        Logger.error(
+          "Urepo.Docs.fetch_and_save/2 index.html not found in paths.keys: #{inspect(paths_keys)}"
+        )
+
+        {:error, {:index_missing, paths_keys}}
+      end
     end
   end
 
