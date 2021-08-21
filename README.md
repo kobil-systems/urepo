@@ -14,11 +14,12 @@ This application takes only few configuration options:
   the RSA 2048-bit key used for signing the repo contents.
 - `:store` - 2-ary tuple in form of `{store :: module(), opts :: keyword()}`
   where `store` is module that implements `Urepo.Store` behaviour. This
-  application provides 2 such modules (more information about their usage can be
+  application provides 3 such modules (more information about their usage can be
   found in their module docs):
 
     + `Urepo.Store.Local`
     + `Urepo.Store.S3`
+    + `Urepo.Store.GoogleCloudStorage`
 
 Example `sys.config`:
 
