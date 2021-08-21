@@ -8,7 +8,7 @@ defmodule Urepo.Store.GoogleCloudStorage do
 
   ## Additional configuration
 
-  When using `Urepo.Store.S3` store then `:goth` need to be configured accordingly
+  When using `Urepo.Store.GoogleCloudStorage` store then `:goth` need to be configured accordingly
   with the appropriate service account credentials.
 
   ```elixir
