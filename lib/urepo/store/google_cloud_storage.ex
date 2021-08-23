@@ -36,6 +36,8 @@ defmodule Urepo.Store.GoogleCloudStorage do
       %{name: path},
       content
     )
+
+    :ok
   end
 
   @impl true
