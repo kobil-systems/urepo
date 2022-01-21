@@ -140,7 +140,7 @@ defmodule Urepo.Docs do
   def handle_call({:publish, name, version, tarball}, _ref, {store, index}) do
     reply = Store.put(store, Path.join(@prefix, "#{name}-#{version}.tar"), tarball)
 
-    new_index = Map.update(index, name, [version], &Utils.append_version(&1, version))
+    new_index = Map.update(index, name, [version], &Utils.append_version_for_docs(&1, version))
 
     Store.put(
       store,
