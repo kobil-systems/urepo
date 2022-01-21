@@ -6,8 +6,9 @@ defmodule Urepo.Docs.Router do
   alias Urepo.Docs
   alias Urepo.Docs.View
 
-  import Urepo.Endpoint, only: [route: 2, redirect: 2]
+  import Urepo.Endpoint, only: [route: 2, redirect: 2, set_inferred_content_type: 2]
 
+  plug(:set_inferred_content_type)
   plug(:match)
   plug(:dispatch)
 

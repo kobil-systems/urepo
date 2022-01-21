@@ -8,7 +8,9 @@ defmodule Urepo.Docs.View do
   def send(conn, status \\ 200, name, assigns) do
     rendered = apply(__MODULE__, name, [Keyword.put(assigns, :conn, conn)])
 
-    Plug.Conn.send_resp(conn, status, rendered)
+    conn
+    |> Plug.Conn.put_resp_header("content-type", "text/html")
+    |> Plug.Conn.send_resp(status, rendered)
   end
 
   EEx.function_from_string(
