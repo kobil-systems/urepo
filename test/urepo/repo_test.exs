@@ -39,7 +39,7 @@ defmodule Urepo.RepoTest do
     assert :ok = @subject.add(name, %{release | version: "0.2.0"})
     assert :ok = @subject.add(name, %{release | version: "0.1.0"})
 
-    assert {:ok, [%{version: "0.2.0"}, %{version: "0.1.1"}, %{version: "0.1.0"}]} =
+    assert {:ok, [%{version: "0.1.0"}, %{version: "0.1.1"}, %{version: "0.2.0"}]} =
              @subject.get_releases(name)
   end
 
@@ -58,7 +58,7 @@ defmodule Urepo.RepoTest do
     Application.stop(:urepo)
     Application.ensure_all_started(:urepo)
 
-    assert {:ok, [%{version: "0.2.0"}, %{version: "0.1.1"}, %{version: "0.1.0"}]} =
+    assert {:ok, [%{version: "0.1.0"}, %{version: "0.1.1"}, %{version: "0.2.0"}]} =
              @subject.get_releases(name)
   end
 end

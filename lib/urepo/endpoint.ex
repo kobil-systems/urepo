@@ -69,4 +69,11 @@ defmodule Urepo.Endpoint do
   def handle_errors(conn, error) do
     send_resp(conn, conn.status, "Something went wrong: #{inspect(error)}")
   end
+
+  def set_inferred_content_type(conn, _opts) do
+    Plug.Conn.put_resp_content_type(
+      conn,
+      MIME.from_path(conn.request_path)
+    )
+  end
 end

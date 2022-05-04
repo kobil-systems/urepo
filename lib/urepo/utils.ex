@@ -7,7 +7,7 @@ defmodule Urepo.Utils do
   Add new version to the enumerable. Resulting enumerable will be deduplicated
   and will be sorted by versions in decreasing order (highest version first).
   """
-  def append_version(enumerable, new) do
+  def append_version_for_docs(enumerable, new) do
     enumerable
     |> Enum.concat(List.wrap(new))
     |> Enum.sort({:desc, Version})
@@ -15,13 +15,14 @@ defmodule Urepo.Utils do
   end
 
   @doc """
-  Add new version to the enumerable and then sort using value returned by
-  `by` callback.
+  Add new version to the enumerable. Resulting enumerable will be deduplicated
+  and sorted using value returned by the `by` callback in
+  ascending order (lowest version first).
   """
-  def append_version(enumerable, new, by) do
+  def append_version_for_packages(enumerable, new, by) do
     enumerable
     |> Enum.concat(List.wrap(new))
-    |> Enum.sort_by(by, {:desc, Version})
+    |> Enum.sort_by(by, {:asc, Version})
     |> Enum.dedup_by(by)
   end
 

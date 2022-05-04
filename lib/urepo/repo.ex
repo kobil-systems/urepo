@@ -88,7 +88,7 @@ defmodule Urepo.Repo do
           {[release], [release]}
 
         old when is_list(old) ->
-          new = Utils.append_version(old, release, by)
+          new = Utils.append_version_for_packages(old, release, by)
           {new, new}
       end)
 
